@@ -1,5 +1,10 @@
 # ZOOM 클론 코딩
 
+## 강의
+
+- 노마드 코더 `Zoom 클론 코딩`
+- https://nomadcoders.co/
+
 ## 필요 개념
 
 - ExpressJS : http와 Connect 컴포넌트를 기반으로 하는 웹 프레임워크
