@@ -26,6 +26,21 @@
 
 ## WebSocket 동작
 
+dsadssad
+
 - https://developer.mozilla.org/
 - ws를 이용해 backend와 frontend 사이 연결.
 - node.js의 Wewb Socket은 EventListener를 통해 동작.
+
+## SocketIO
+
+- 실시간 기능을 만들어주는 framework
+- 실시간, 양방향, event 기반의 통신 제공.
+- WebSocket을 사용하지만, WebSocket이 불가능하다면 다른 방식 사용.
+  - (ex) Http long-polling
+- SocketIO 장점
+  - 자동 재연결 제공.
+  - 커스텀 명령 가능.
+  - 문자열이 아닌 데이터 전송 가능.
+  - callback 가능. (bakc에서 front 함수 실행 가능)
+- Backend를 위한 Admin UI : `npm i @socket.io/admin-ui`
