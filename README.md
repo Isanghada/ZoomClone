@@ -44,3 +44,30 @@ dsadssad
   - 문자열이 아닌 데이터 전송 가능.
   - callback 가능. (bakc에서 front 함수 실행 가능)
 - Backend를 위한 Admin UI : `npm i @socket.io/admin-ui`
+
+## WebRTC
+
+- Web Real-Time Communication
+- 실시간 커뮤니케이션을 가능하게 해주는 기술.
+- Signalling을 통해 peer-to-peer 구현.
+  - 서버는 각 Client의 정보를 전달. (위치, 세팅 등의 정보)
+  - 영상, 오디오 등이 서버를 거치지 않고 전달.
+- 동작 방식
+  - offer
+  - answer
+  - candidate : 연결 방식
+- 웹 사이트 퍼블릭 : `npm i localtunnel`, `npm i -g localtunnel`
+  - 서버의 URL 생성 : 일시적으로 무료
+- 추가 학습 영역 : Data Channel
+  - 이미지, 파일, 게임 업데이트 패킷 등 모든 데이터를 peer-to-peer로 전달.
+- Signalling의 단점
+  - 너무 많은 peer를 가지면 느려지기 시작. (Full Mesh)
+
+## STUN 서버
+
+- 장치의 공용 IP 주소를 알려주는 역할.
+  - 같은 네트워크에 있는 것이 아니라면 정상적으로 연결되지 않는다.
+  - 각 기기의 IP 주소를 찾아야하기 때문에 필요.
+- 간단하게는 구글에서 제공하는 서버를 사용할 수 있음.
+  - **테스트 용도로 활용.**
+  - 실제 서비스를 위해서는 직접 구현하는 것이 필요할 수 있음.
