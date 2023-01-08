@@ -58,6 +58,7 @@ dsadssad
   - candidate : 연결 방식
 - 웹 사이트 퍼블릭 : `npm i localtunnel`, `npm i -g localtunnel`
   - 서버의 URL 생성 : 일시적으로 무료
+  - 시작 : `lt --port 포트번호`
 - 추가 학습 영역 : Data Channel
   - 이미지, 파일, 게임 업데이트 패킷 등 모든 데이터를 peer-to-peer로 전달.
 - Signalling의 단점
