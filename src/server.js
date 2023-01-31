@@ -20,119 +20,51 @@ const wsServer = SocketIO(httpServer);
 const handleListen = () => console.log("Listening on http://localhost:3000");
 httpServer.listen(3000, handleListen);
 
+let users = {};
+
+let socketToRoom = {};
+
+const maximum = 4;
+
 wsServer.on("connection", (socket) => {
-  socket.on("join_room", (roomName) => {
-    socket.join(roomName);
-    socket.to(roomName).emit("welcome");
-  });
-  socket.on("offer", (offer, roomName) => {
-    socket.to(roomName).emit("offer", offer);
-  });
-  socket.on("answer", (answer, roomName) => {
-    socket.to(roomName).emit("answer", answer);
-  });
-  socket.on("ice", (ice, roomName) => {
-    socket.to(roomName).emit("ice", ice);
-  });
-});
-
-// 멀티 채팅 With SocketIO
-/*
-const httpServer = http.createServer(app);
-const wsServer = new Server(httpServer, {
-  cors: {
-    origin: ["https://admin.socket.io"],
-    credentials: true,
-  },
-});
-
-httpServer.listen(3000, handleListen);
-
-instrument(wsServer, {
-  auth: false,
-});
-
-function publicRooms() {
-  const {
-    sockets: {
-      adapter: { sids, rooms },
-    },
-  } = wsServer;
-
-  const publicRooms = [];
-  rooms.forEach((_, key) => {
-    if (sids.get(key) === undefined) {
-      publicRooms.push(key);
+  socket.on("join_room", ({ roomName, username }) => {
+    if (users[roomName]) {
+      const length = users[roomName].length;
+      if (length == maximum) {
+        socket.to(socket.id).emit("room_full");
+        return;
+      }
+      users[roomName].push({ id: socket.id, user: username });
+    } else {
+      users[roomName] = [{ id: socket.id, user: username }];
     }
-  });
-  return publicRooms;
-}
+    socketToRoom[socket.id] = roomName;
 
-function countRoom(roomName) {
-  return wsServer.sockets.adapter.rooms.get(roomName)?.size;
-}
-
-wsServer.on("connection", (socket) => {
-  socket["nickname"] = "Anon";
-
-  socket.onAny((event) => {
-    console.log(`Socket Evetn : ${event}`);
-  });
-
-  socket.on("enter_room", (roomName, done) => {
     socket.join(roomName);
-    done(countRoom(roomName));
-    // 본인을 제외한 방의 모든 참가인원에게 전달.
-    socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
-    wsServer.sockets.emit("room_change", publicRooms());
-  });
 
-  socket.on("disconnecting", () => {
-    socket.rooms.forEach((room) =>
-      socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1)
-    );
+    socket.to(roomName).emit("welcome", socket.id);
+  });
+  socket.on("offer", (offer, socketId, roomName) => {
+    socket.to(socketId).emit("offer", offer, socket.id);
+  });
+  socket.on("answer", (answer, socketId, roomName) => {
+    socket.to(socketId).emit("answer", answer, socket.id);
+  });
+  socket.on("ice", (ice, socketId, roomName) => {
+    socket.to(socketId).emit("ice", ice, socket.id);
   });
 
   socket.on("disconnect", () => {
-    wsServer.sockets.emit("room_change", publicRooms());
-  });
-
-  socket.on("new_message", (msg, room, done) => {
-    socket.to(room).emit("new_message", `${socket.nickname} : ${msg}`);
-    done();
-  });
-
-  socket.on("nickname", (nickname) => {
-    socket["nickname"] = nickname;
-  });
-});
-*/
-
-// 멀티 채팅 With WebSocket
-/*
-const wss = new WebSocket.Server({ httpServer });
-
-const sockets = [];
-
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "Anon";
-
-  console.log("Connected to Browser ✅");
-
-  socket.on("close", () => console.log("Disconnected from the Browser ❌"));
-  socket.on("message", (msg) => {
-    const message = JSON.parse(msg.toString());
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) => {
-          aSocket.send(`${socket.nickname} : ${message.payload}`);
-        });
-        break;
-      case "nickname":
-        socket["nickname"] = message.payload;
-        break;
+    const roomID = socketToRoom[socket.io];
+    let room = users[roomID];
+    if (room) {
+      room = room.filters((user) => user.id !== socket.id);
+      users[roomID] = room;
+      if (room.length === 0) {
+        delete users[roomID];
+        return;
+      }
     }
+    socket.to(roomID).emit("user_exit", { id: socket.id });
   });
 });
-*/
