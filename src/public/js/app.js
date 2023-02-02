@@ -1,4 +1,11 @@
-const socket = io();
+const socket = io("https://pocha.online", {
+  cors: {
+    origin: "*",
+    methods: ['GET', 'PUT', 'POST', "HEAD", "PATCH", "DELETE"]
+  }
+  
+});
+// const socket = io();
 
 const myFace = document.getElementById("myFace");
 const muteBtn = document.getElementById("mute");
