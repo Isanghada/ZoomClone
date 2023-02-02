@@ -1,11 +1,10 @@
-const socket = io("https://pocha.online", {
-  cors: {
-    origin: "*",
-    methods: ['GET', 'PUT', 'POST', "HEAD", "PATCH", "DELETE"]
-  }
-  
-});
-// const socket = io();
+// const socket = io("https://pocha.online", {
+//   cors: {
+//     origin: "*",
+//     methods: ["GET", "PUT", "POST", "HEAD", "PATCH", "DELETE"],
+//   },
+// });
+const socket = io();
 
 const myFace = document.getElementById("myFace");
 const muteBtn = document.getElementById("mute");
@@ -161,8 +160,8 @@ socket.on("ice", (ice, socketId) => {
 
 socket.on("user_exit", ({ id }) => {
   delete myPeerConnections[id];
-  console.log("==============>방 탈출!!!")
-  console.log(id)
+  console.log("==============>방 탈출!!!");
+  console.log(id);
 });
 
 socket.on("room_full", () => {
