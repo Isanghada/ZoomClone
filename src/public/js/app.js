@@ -161,6 +161,14 @@ socket.on("ice", (ice, socketId) => {
 
 socket.on("user_exit", ({ id }) => {
   delete myPeerConnections[id];
+  console.log("==============>방 탈출!!!")
+  console.log(id)
+});
+
+socket.on("room_full", () => {
+  console.log("방이 가득 찼습니다!!!!!!!!!");
+  alert("방이 가득 찼습니다!!!!!!!!");
+  location.href = "http://localhost:3000";
 });
 
 // RTC Code
