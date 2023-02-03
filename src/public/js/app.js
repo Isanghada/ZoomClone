@@ -1,10 +1,10 @@
-// const socket = io("https://pocha.online", {
-//   cors: {
-//     origin: "*",
-//     methods: ["GET", "PUT", "POST", "HEAD", "PATCH", "DELETE"],
-//   },
-// });
-const socket = io();
+const socket = io("https://pocha.online", {
+  cors: {
+    origin: "*",
+    methods: ["GET", "PUT", "POST", "HEAD", "PATCH", "DELETE"],
+  },
+});
+// const socket = io();
 
 const myFace = document.getElementById("myFace");
 const muteBtn = document.getElementById("mute");
@@ -160,12 +160,35 @@ socket.on("ice", (ice, socketId) => {
 
 socket.on("user_exit", ({ id }) => {
   delete myPeerConnections[id];
-  console.log("==============>방 탈출!!!");
-  console.log(id);
+  console.log("==============>방 탈출!!!")
+  console.log(id)
+
+  userCount = 1;
+  const keys = Object.keys(myPeerConnections);
+  for (let socketID of keys) {
+    console.log("---------");
+    console.log(myPeerConnections[socketID]);
+    console.log(myPeerConnections[socketID].getReceivers());
+    console.log("---------");
+    const receivers = myPeerConnections[socketID].getReceivers();
+    const media = new MediaStream([receivers[0].track, receivers[1].track])
+    const peerFace = document.getElementById(`peerFace${userCount}`);
+    peerFace.srcObject = media;
+    userCount += 1;
+  }
+
+  console.log(userCount + "==================");
+  let temp = userCount;
+  if (temp < 4) {
+    while (temp < 4) {
+      const peerFace = document.getElementById(`peerFace${temp}`);
+      peerFace.srcObject = null;
+      temp += 1;
+    }
+  }
 });
 
 socket.on("room_full", () => {
-  console.log("방이 가득 찼습니다!!!!!!!!!");
   alert("방이 가득 찼습니다!!!!!!!!");
   location.href = "http://localhost:3000";
 });
