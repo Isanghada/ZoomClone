@@ -1,9 +1,10 @@
-const socket = io("https://pocha.online", {
-  cors: {
-    origin: "*",
-    methods: ["GET", "PUT", "POST", "HEAD", "PATCH", "DELETE"],
-  },
-});
+const socket = io("https://pocha.online");
+// const socket = io("https://pocha.online", {
+//   cors: {
+//     origin: "*",
+//     methods: ["GET", "PUT", "POST", "HEAD", "PATCH", "DELETE"],
+//   },
+// });
 // const socket = io();
 
 const myFace = document.getElementById("myFace");
