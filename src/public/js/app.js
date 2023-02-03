@@ -135,10 +135,10 @@ socket.on("welcome", async (socketId) => {
   const offer = await myPeerConnections[socketId].createOffer();
   myPeerConnections[socketId].setLocalDescription(offer);
   console.log("sent the offer");
-  socket.emit("offer", offer, socketId, roomName);
+  socket.emit("offer", offer, socketId, roomName, {username: "유저네임", nickname : "유저닉네임"});
 });
 
-socket.on("offer", async (offer, socketId) => {
+socket.on("offer", async (offer, socketId, userInfo) => {
   console.log("received the offer");
   myPeerConnections[socketId] = makeConnection();
   myPeerConnections[socketId].setRemoteDescription(offer);
