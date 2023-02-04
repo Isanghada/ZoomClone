@@ -34,9 +34,16 @@ wsServer.on("connection", (socket) => {
         socket.emit("room_full");
         return;
       }
-      users[roomName].push({ id: socket.id, user: username });
+      socket.emit("users_of_room", users[roomName]);
+      users[roomName].push({
+        id: socket.id,
+        username: username,
+        nickname: nickname,
+      });
     } else {
-      users[roomName] = [{ id: socket.id, user: username }];
+      users[roomName] = [
+        { id: socket.id, username: username, nickname: nickname },
+      ];
     }
     socketToRoom[socket.id] = roomName;
 

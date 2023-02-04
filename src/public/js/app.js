@@ -131,15 +131,26 @@ async function handleWelcomeSubmit(event) {
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 // Socket Code
-socket.on("welcome", async (socketId) => {
+socket.on("users_of_room", async (users) => {
+  users.forEach((user) => {
+    myPeerConnections[user.id] = {
+      username: user.username,
+      nickname: user.nickname,
+    };
+  });
+});
+
+socket.on("welcome", async (socketId, user) => {
   let myPeer = makeConnection();
 
   myPeerConnections[socketId] = {
     peer: myPeer,
-    username: "test",
-    nickname: "test",
+    username: user.username,
+    nickname: user.nickname,
   };
+  console.log("환영!!!!----------------------------");
   console.log(myPeerConnections[socketId]);
+  console.log("------------------------------------");
 
   const offer = await myPeerConnections[socketId]["peer"].createOffer();
   myPeerConnections[socketId]["peer"].setLocalDescription(offer);
@@ -149,7 +160,6 @@ socket.on("welcome", async (socketId) => {
   const receivers = myPeerConnections[socketId]["peer"].getReceivers();
   const peerStream = new MediaStream([receivers[0].track, receivers[1].track]);
   handleAddStream(peerStream);
-  console.log("-----------------welcome에서 받음!");
   console.log("sent the offer");
   socket.emit("offer", offer, socketId, roomName, {
     username: "testname",
@@ -159,10 +169,10 @@ socket.on("welcome", async (socketId) => {
 
 socket.on("offer", async (offer, socketId, userInfo) => {
   console.log("received the offer");
-  myPeerConnections[socketId] = {
-    username: userInfo.username,
-    nickname: userInfo.nickname,
-  };
+  // myPeerConnections[socketId] = {
+  //   username: userInfo.username,
+  //   nickname: userInfo.nickname,
+  // };
   myPeerConnections[socketId]["peer"] = makeConnection();
   myPeerConnections[socketId]["peer"].setRemoteDescription(offer);
   const answer = await myPeerConnections[socketId]["peer"].createAnswer();
@@ -172,7 +182,6 @@ socket.on("offer", async (offer, socketId, userInfo) => {
   const receivers = myPeerConnections[socketId]["peer"].getReceivers();
   const peerStream = new MediaStream([receivers[0].track, receivers[1].track]);
   handleAddStream(peerStream);
-  console.log("-----------------offer에서 받음!");
 
   socket.emit("answer", answer, socketId, roomName);
   console.log("sent the answer");
@@ -190,16 +199,11 @@ socket.on("ice", (ice, socketId) => {
 
 socket.on("user_exit", ({ id }) => {
   delete myPeerConnections[id];
-  console.log("==============>방 탈출!!!");
-  console.log(id);
+  console.log(`${id}==============>방 탈출!!!`);
 
   userCount = 1;
   const keys = Object.keys(myPeerConnections);
   for (let socketID of keys) {
-    console.log("---------");
-    console.log(myPeerConnections[socketID]["peer"]);
-    console.log(myPeerConnections[socketID]["peer"].getReceivers());
-    console.log("---------");
     const receivers = myPeerConnections[socketID]["peer"].getReceivers();
     const peerStream = new MediaStream([
       receivers[0].track,
@@ -211,7 +215,6 @@ socket.on("user_exit", ({ id }) => {
     // userCount += 1;
   }
 
-  console.log(userCount + "==================");
   let temp = userCount;
   if (temp < 4) {
     while (temp < 4) {
