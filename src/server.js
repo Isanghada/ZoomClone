@@ -27,7 +27,7 @@ let socketToRoom = {};
 const maximum = 4;
 
 wsServer.on("connection", (socket) => {
-  socket.on("join_room", ({ roomName, username }) => {
+  socket.on("join_room", ({ roomName, username, nickname }) => {
     if (users[roomName]) {
       const length = users[roomName].length;
       if (length == maximum) {
@@ -42,10 +42,10 @@ wsServer.on("connection", (socket) => {
 
     socket.join(roomName);
 
-    socket.to(roomName).emit("welcome", socket.id);
+    socket.to(roomName).emit("welcome", socket.id, { username, nickname });
   });
-  socket.on("offer", (offer, socketId, roomName) => {
-    socket.to(socketId).emit("offer", offer, socket.id);
+  socket.on("offer", (offer, socketId, roomName, userInfo) => {
+    socket.to(socketId).emit("offer", offer, socket.id, userInfo);
   });
   socket.on("answer", (answer, socketId, roomName) => {
     socket.to(socketId).emit("answer", answer, socket.id);
