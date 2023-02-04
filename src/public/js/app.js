@@ -119,7 +119,11 @@ async function handleWelcomeSubmit(event) {
   event.preventDefault();
   const input = welcomeForm.querySelector("input");
   await initCall();
-  socket.emit("join_room", { roomName: input.value, username: "testname" });
+  socket.emit("join_room", {
+    roomName: input.value,
+    username: "testname",
+    nickname: "testnickname",
+  });
   roomName = input.value;
   input.value = "";
 }
@@ -135,7 +139,10 @@ socket.on("welcome", async (socketId) => {
   const offer = await myPeerConnections[socketId].createOffer();
   myPeerConnections[socketId].setLocalDescription(offer);
   console.log("sent the offer");
-  socket.emit("offer", offer, socketId, roomName, {username: "유저네임", nickname : "유저닉네임"});
+  socket.emit("offer", offer, socketId, roomName, {
+    username: "testname",
+    nickname: "testnickname",
+  });
 });
 
 socket.on("offer", async (offer, socketId, userInfo) => {
@@ -161,8 +168,8 @@ socket.on("ice", (ice, socketId) => {
 
 socket.on("user_exit", ({ id }) => {
   delete myPeerConnections[id];
-  console.log("==============>방 탈출!!!")
-  console.log(id)
+  console.log("==============>방 탈출!!!");
+  console.log(id);
 
   userCount = 1;
   const keys = Object.keys(myPeerConnections);
@@ -172,7 +179,7 @@ socket.on("user_exit", ({ id }) => {
     console.log(myPeerConnections[socketID].getReceivers());
     console.log("---------");
     const receivers = myPeerConnections[socketID].getReceivers();
-    const media = new MediaStream([receivers[0].track, receivers[1].track])
+    const media = new MediaStream([receivers[0].track, receivers[1].track]);
     const peerFace = document.getElementById(`peerFace${userCount}`);
     peerFace.srcObject = media;
     userCount += 1;
