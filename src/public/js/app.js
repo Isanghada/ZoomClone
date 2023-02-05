@@ -25,7 +25,7 @@ const ssulTitle = document.getElementById("ssul");
 const ssulBtn = document.getElementById("ssulChange");
 
 // 포차
-let pochaInfo = {};
+let pochaInfo = {}; // 처음부터 필요한 포차 정보가 있다면 axios로 받아오기
 const pochaChangeBtn = document.getElementById("pochaChange");
 const pochaExtensionBtn = document.getElementById("pochaExtension");
 const pochaCheersBtn = document.getElementById("pochaCheers");

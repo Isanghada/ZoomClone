@@ -81,7 +81,6 @@ wsServer.on("connection", (socket) => {
 
   // 썰 변경
   socket.on("ssul_change", (roomName, ssul) => {
-    // 방 전체에 전달.
     wsServer.to(roomName).emit("ssul_change", ssul);
   });
 
