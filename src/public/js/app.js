@@ -29,6 +29,7 @@ let pochaInfo = {}; // 처음부터 필요한 포차 정보가 있다면 axios�
 const pochaChangeBtn = document.getElementById("pochaChange");
 const pochaExtensionBtn = document.getElementById("pochaExtension");
 const pochaCheersBtn = document.getElementById("pochaCheers");
+const pochaExitBtn = document.getElementById("pochaExit");
 
 const call = document.getElementById("call");
 call.hidden = true;
@@ -159,6 +160,18 @@ async function handlePochaCheers() {
   socket.emit("pocha_cheers", roomName);
 }
 pochaCheersBtn.addEventListener("click", handlePochaCheers);
+
+// 포차 나가기 이벤트
+async function handlePochaExit() {
+  await api.put("/pocha/exit", {
+    isHost: false,
+    pochaId: 3,
+    username: "1zjK_Yrq6klkIxBWj8bj1WJkV5ng-7jhrRGvlIJXawI",
+    waiting: false,
+  });
+  location.href = "http://localhost:3000";
+}
+pochaExitBtn.addEventListener("click", handlePochaExit);
 
 //////////////////////////////////////////////////////
 
@@ -299,6 +312,8 @@ socket.on("user_exit", async ({ id }) => {
   }
 
   await pocha_config_update(3);
+  // host인지 확인.
+  // await pocha_participants();
 });
 
 socket.on("room_full", () => {
