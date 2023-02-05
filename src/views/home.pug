@@ -10,6 +10,7 @@ html(lang="en")
   body 
     header 
       h1 Noom
+      h2#ssul
     main
       div#welcome
         form
@@ -18,12 +19,21 @@ html(lang="en")
       div#call
         div#myStream
           video#myFace(autoplay, playsinline, width="400", height="400")
-          button#mute Mute
-          button#camera Turn Camera Off
+          div(style="text-align:center")
+            div
+              button#mute Mute
+              button#camera Turn Camera Off
+            div
+              button#ssulChange Sull Change
+              button#pochaChange Pocha Change
+            div 
+              button#pochaExtension Pocha Extension
+              button#pochaCheers Pocha Cheers
           select#cameras
           video#peerFace1(autoplay, playsinline, width="200", height="200")
           video#peerFace2(autoplay, playsinline, width="200", height="200")
           video#peerFace3(autoplay, playsinline, width="200", height="200")
     //- socket.io 스크립트 추가.
     script(src="/socket.io/socket.io.js")
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
     script(src="/public/js/app.js")
