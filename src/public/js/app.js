@@ -20,16 +20,13 @@ const api = axios.create({
   },
 });
 
-// 썰
-const ssulTitle = document.getElementById("ssul");
-const ssulBtn = document.getElementById("ssulChange");
-
 // 포차
 let pochaInfo = {}; // 처음부터 필요한 포차 정보가 있다면 axios로 받아오기
 const pochaChangeBtn = document.getElementById("pochaChange");
 const pochaExtensionBtn = document.getElementById("pochaExtension");
 const pochaCheersBtn = document.getElementById("pochaCheers");
 const pochaExitBtn = document.getElementById("pochaExit");
+const pochaGameBtn = document.getElementById("pochaGame");
 
 const call = document.getElementById("call");
 call.hidden = true;
@@ -121,17 +118,6 @@ async function handleCameraChange() {
 //////////////////////////////////////////////////////
 // 포차 기능!!!!
 
-// 썰 변경 이벤트
-function handleSsulClick() {
-  let input = prompt("Ssul을 입력하세요!", "새로운 타이틀!");
-  if (input == null) return;
-
-  // 썰 변경.
-
-  socket.emit("ssul_change", roomName, input);
-}
-ssulBtn.addEventListener("click", handleSsulClick);
-
 // 포차 설정 변경 이벤트
 async function handlePochaUpdate() {
   // 설정값 입력.
@@ -172,6 +158,15 @@ async function handlePochaExit() {
   location.href = "http://localhost:3000";
 }
 pochaExitBtn.addEventListener("click", handlePochaExit);
+
+// 포차 게임 선택 이벤트
+async function handlePochaGame() {
+  const inputString = prompt("게임 이름을 입력해주세요!");
+  if (inputString === null || inputString === undefined) return;
+
+  socket.emit("pocha_game", roomName, inputString);
+}
+pochaGameBtn.addEventListener("click", handlePochaGame);
 
 //////////////////////////////////////////////////////
 
@@ -333,15 +328,6 @@ async function pocha_config_update(pochaId) {
   console.log(pochaInfo);
 }
 
-// 썰 변경! : 방 설정 다시 불러오기.
-socket.on("ssul_change", async (ssul) => {
-  console.log("썰 변경!----------------------");
-  ssulTitle.innerText = ssul;
-
-  // 방 설정 다시 불러오기!!! 테스트
-  await pocha_config_update(3);
-});
-
 // 포차 설정 변경! : 방 설정 다시 불러오기.
 socket.on("pocha_change", async () => {
   console.log("포차 설정 변경!----------------------");
@@ -361,6 +347,13 @@ socket.on("pocha_cheers", async () => {
   console.log("포차 짠!!!!!----------------------");
   // 방 설정 다시 불러오기!!! 테스트
   await pocha_config_update(3);
+});
+
+// 포차 게임 기능
+socket.on("pocha_game", async (game, data) => {
+  console.log("포차 게임!!-------------------------");
+  console.log(game);
+  console.log(data);
 });
 
 //////////////////////////////////////////////////////
@@ -402,6 +395,6 @@ function handleAddStream(stream) {
   // 본인 비디오 제외 상대 비디오 클릭 시 이벤트 설정!!!
   peerFace.onclick = () => {
     alert("클릭 테스트!!!");
-  }
+  };
   ///////////////////////////////////////////////////
 }
