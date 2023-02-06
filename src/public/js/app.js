@@ -398,4 +398,10 @@ function handleAddStream(stream) {
   const peerFace = document.getElementById(`peerFace${userCount}`);
   userCount += 1;
   peerFace.srcObject = stream;
+  ///////////////////////////////////////////////////
+  // 본인 비디오 제외 상대 비디오 클릭 시 이벤트 설정!!!
+  peerFace.onclick = () => {
+    alert("클릭 테스트!!!");
+  }
+  ///////////////////////////////////////////////////
 }
