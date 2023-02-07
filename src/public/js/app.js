@@ -468,7 +468,7 @@ function handleAddStream(stream) {
 
   ///////////////////////////////////////////////////
   // 시간 계산
-  console.log( "2023-02-07T16:43:00.000");
+  console.log( "2023-02-07T16:43:00.000");  // 포차 시작 시간으로 설정?
   let date = new Date( "2023-02-07T16:43:00.000")
   console.log(date, date.getTime());
   let goal = date;
