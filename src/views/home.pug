@@ -24,19 +24,20 @@ html(lang="en")
               button#mute Mute
               button#camera Turn Camera Off
             div
-              button#ssulChange Sull Change
               button#pochaChange Pocha Change
-            div 
               button#pochaExtension Pocha Extension
+            div 
               button#pochaCheers Pocha Cheers
-            div
               button#pochaExit Pocha Exit
+            div
+              button#pochaGame Pocha Game
           select#cameras
           video#peerFace1(autoplay, playsinline, width="200", height="200")
           video#peerFace2(autoplay, playsinline, width="200", height="200")
           video#peerFace3(autoplay, playsinline, width="200", height="200")
           video#peerFace4(autoplay, playsinline, width="200", height="200")
           video#peerFace5(autoplay, playsinline, width="200", height="200")
+      div#game
     //- socket.io 스크립트 추가.
     script(src="/socket.io/socket.io.js")
     script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")

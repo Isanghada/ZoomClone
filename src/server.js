@@ -4,14 +4,27 @@ import http from "http";
 // import { instrument } from "@socket.io/admin-ui";
 import SocketIO from "socket.io";
 import express from "express";
+import axios from "axios";
 
 const app = express();
+const api = axios.create({
+  baseURL: "https://i8e201.p.ssafy.io/api",
+  headers: {
+    "Content-Type": "application/json;charset=utf-8",
+  },
+});
 
 app.set("view engine", "pug");
 app.set("views", __dirname + "/views");
 
 app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (req, res) => res.render("home"));
+
+// 게임 기능!!
+app.get("/game", (req, res) => res.render("game"));
+app.get("/game1", (req, res) => res.render("game1"));
+app.get("/game2", (req, res) => res.render("game2"));
+
 app.get("/*", (req, res) => res.redirect("/"));
 
 const httpServer = http.createServer(app);
@@ -79,11 +92,6 @@ wsServer.on("connection", (socket) => {
 
   // 포차 기능!!
 
-  // 썰 변경
-  socket.on("ssul_change", (roomName, ssul) => {
-    wsServer.to(roomName).emit("ssul_change", ssul);
-  });
-
   // 포차 설정 변경
   socket.on("pocha_change", (roomName) => {
     wsServer.to(roomName).emit("pocha_change");
@@ -98,4 +106,46 @@ wsServer.on("connection", (socket) => {
   socket.on("pocha_cheers", (roomName) => {
     wsServer.to(roomName).emit("pocha_cheers");
   });
+
+  // 포차 게임 기능.
+  socket.on("pocha_game", async (roomName, game) => {
+    let data = null;
+    if (game === "라이어") {
+      await api.get("/pocha/game/liar").then((result) => {
+        data = result.data;
+      });
+    } else if (game === "양세찬") {
+      await api.get("/pocha/game/ysc").then((result) => {
+        data = result.data;
+      });
+    } else if (game === "밸런스1") {
+      await api.get("/pocha/game/balance/0").then((result) => {
+        data = result.data;
+      });
+    } else if (game === "밸런스2") {
+      await api.get("/pocha/game/balance/1").then((result) => {
+        data = result.data;
+      });
+    } else {
+      return;
+    }
+
+    wsServer.to(roomName).emit("pocha_game", game, data);
+  });
+
+  ///////////////////////////////////////////////////
+  // 포차 게임 기능
+  socket.on("pocha_game_step1", roomName => {
+    wsServer.to(roomName).emit("pocha_game_step1");
+  });
+  socket.on("pocha_game_signal", roomName => {
+    socket.to(roomName).emit("pocha_game_signal");
+  })
+  socket.on("pocha_game_step2", roomName => {
+    wsServer.to(roomName).emit("pocha_game_step2");
+  });
+  socket.on("pocha_game_step3", roomName => {
+    wsServer.to(roomName).emit("pocha_game_step3");
+  });
+  ///////////////////////////////////////////////////
 });
