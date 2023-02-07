@@ -20,6 +20,14 @@ const api = axios.create({
   },
 });
 
+// include
+const include = axios.create({
+  baseURL: "http://localhost:3000",
+  headers: {
+    "Content-Type": "application/json;charset=utf-8",
+  },
+})
+
 // 포차
 let pochaInfo = {}; // 처음부터 필요한 포차 정보가 있다면 axios로 받아오기
 const pochaChangeBtn = document.getElementById("pochaChange");
@@ -27,6 +35,13 @@ const pochaExtensionBtn = document.getElementById("pochaExtension");
 const pochaCheersBtn = document.getElementById("pochaCheers");
 const pochaExitBtn = document.getElementById("pochaExit");
 const pochaGameBtn = document.getElementById("pochaGame");
+const pochaGame = document.getElementById("game");
+
+// 게임 테스트
+let gameStep1 = null;
+let gameStep2 = null;
+let gameStep3 = null;
+let gameSignal = null;
 
 const call = document.getElementById("call");
 call.hidden = true;
@@ -348,12 +363,64 @@ socket.on("pocha_cheers", async () => {
   // 방 설정 다시 불러오기!!! 테스트
   await pocha_config_update(3);
 });
+//////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////
 // 포차 게임 기능
 socket.on("pocha_game", async (game, data) => {
   console.log("포차 게임!!-------------------------");
   console.log(game);
   console.log(data);
+  await include.get("/game")
+    .then(result => {
+      pochaGame.innerHTML = result.data;
+    })
+  
+  gameStep1 = document.getElementById("gameStep1");
+  gameStep1.addEventListener("click", () => {
+    socket.emit("pocha_game_step1", roomName);
+  })
+});
+
+// 포차 게임 다음 화면
+socket.on("pocha_game_step1", async () => {
+  await include.get("/game1")
+    .then(result => {
+      pochaGame.innerHTML = result.data;
+    })
+  
+  gameStep2 = document.getElementById("gameStep2");
+  gameStep2.addEventListener("click", () => {
+    socket.emit("pocha_game_step2", roomName);
+  })
+  gameSignal = document.getElementById("gameSignal")
+  gameSignal.addEventListener("click", () => {
+    socket.emit("pocha_game_signal", roomName);
+  })
+});
+
+// 포차 게임 신호 주고 받기!
+socket.on("pocha_game_signal", async () => {
+  alert("게임 시그널!!!!");
+});
+
+// 포차 게임 마지막 화면
+socket.on("pocha_game_step2", async () => {
+  await include.get("/game2")
+    .then(result => {
+      pochaGame.innerHTML = result.data;
+    })
+  
+  gameStep3 = document.getElementById("gameStep3");
+  gameStep3.addEventListener("click", () => {
+    socket.emit("pocha_game_step3", roomName);
+  })
+});
+
+// 포차 게임 마지막 화면
+socket.on("pocha_game_step3", async () => {
+  alert("게임 종료!!!")
+  pochaGame.innerHTML = "";
 });
 
 //////////////////////////////////////////////////////

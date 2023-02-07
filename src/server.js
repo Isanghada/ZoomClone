@@ -19,6 +19,12 @@ app.set("views", __dirname + "/views");
 
 app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (req, res) => res.render("home"));
+
+// 게임 기능!!
+app.get("/game", (req, res) => res.render("game"));
+app.get("/game1", (req, res) => res.render("game1"));
+app.get("/game2", (req, res) => res.render("game2"));
+
 app.get("/*", (req, res) => res.redirect("/"));
 
 const httpServer = http.createServer(app);
@@ -126,4 +132,20 @@ wsServer.on("connection", (socket) => {
 
     wsServer.to(roomName).emit("pocha_game", game, data);
   });
+
+  ///////////////////////////////////////////////////
+  // 포차 게임 기능
+  socket.on("pocha_game_step1", roomName => {
+    wsServer.to(roomName).emit("pocha_game_step1");
+  });
+  socket.on("pocha_game_signal", roomName => {
+    socket.to(roomName).emit("pocha_game_signal");
+  })
+  socket.on("pocha_game_step2", roomName => {
+    wsServer.to(roomName).emit("pocha_game_step2");
+  });
+  socket.on("pocha_game_step3", roomName => {
+    wsServer.to(roomName).emit("pocha_game_step3");
+  });
+  ///////////////////////////////////////////////////
 });
