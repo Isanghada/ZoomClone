@@ -335,7 +335,6 @@ socket.on("room_full", () => {
 // 포차 기능 받기!!!
 async function pocha_config_update(pochaId) {
   // 방 설정 다시 불러오기!!! 테스트
-  let pochaInfo = {};
   await api.get(`/pocha/${pochaId}`).then((result) => {
     pochaInfo = result.data.data;
   });
@@ -457,8 +456,39 @@ function handleAddStream(stream) {
   console.log("handleAddStream---------------------");
   const peerFace = document.getElementById(`peerFace${userCount}`);
   userCount += 1;
+
+  /////////////////////////////////////////////////////
+  // 상대 카메라 OFF로 시작
+  stream
+    .getVideoTracks()
+    .forEach((track) => (track.enabled = !track.enabled));
+  /////////////////////////////////////////////////////
+  
   peerFace.srcObject = stream;
+
   ///////////////////////////////////////////////////
+  // 시간 계산
+  console.log( "2023-02-07T16:43:00.000");
+  let date = new Date( "2023-02-07T16:43:00.000")
+  console.log(date, date.getTime());
+  let goal = date;
+  goal.setMinutes(goal.getMinutes() + 2);
+  console.log(goal, goal.getTime());
+  let nowTime = new Date();
+  console.log(nowTime, nowTime.getTime());
+  let diff = goal.getTime() - nowTime.getTime()
+  diff = diff < 0 ? 0 : diff;
+  console.log(diff);
+
+  // 시간 경과 후 자동으로 카메라 ON
+  setTimeout(() => {
+    alert("시간 경과!");
+    peerFace.srcObject
+    .getVideoTracks()
+    .forEach((track) => (track.enabled = !track.enabled));
+  }, diff);
+  ///////////////////////////////////////////////////
+  
   // 본인 비디오 제외 상대 비디오 클릭 시 이벤트 설정!!!
   peerFace.onclick = () => {
     alert("클릭 테스트!!!");
