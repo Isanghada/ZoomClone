@@ -20,11 +20,13 @@ const wsServer = SocketIO(httpServer);
 const handleListen = () => console.log("Listening on http://localhost:3000");
 httpServer.listen(3000, handleListen);
 
+let waitRoom = {};
 let users = {};
 
 let socketToRoom = {};
 
 const maximum = 6;
+const wait = 3;
 
 wsServer.on("connection", (socket) => {
   socket.on("join_room", ({ roomName, username, nickname }) => {
@@ -74,7 +76,9 @@ wsServer.on("connection", (socket) => {
         return;
       }
     }
-    socket.to(roomID).emit("user_exit", { id: socket.id });
+    if(waitRoom[roomID] == null || waitRoom[roomID] == undefined ){
+      socket.to(roomID).emit("user_exit", { id: socket.id });
+    }
   });
 
   // 포차 기능!!
@@ -98,4 +102,40 @@ wsServer.on("connection", (socket) => {
   socket.on("pocha_cheers", (roomName) => {
     wsServer.to(roomName).emit("pocha_cheers");
   });
+
+  // 포차 대기
+  socket.on("wait", info => {
+    if (waitRoom[info.roomName] == null || waitRoom[info.roomName] == undefined) {
+      waitRoom[info.roomName] = true;
+    }
+
+    const roomName = info.roomName;
+
+    if (users[roomName]) {
+      const length = users[roomName].length;
+      if (length == maximum) {
+        socket.emit("room_full");
+        return;
+      }
+      users[roomName].push({
+        id: socket.id,
+        username: info.username,
+        nickname: info.nickname,
+      });
+    } else {
+      users[roomName] = [
+        { id: socket.id, username: info.username, nickname: info.nickname },
+      ];
+    }
+    socketToRoom[socket.id] = roomName;
+
+    if (users[roomName].length == 3) {
+      // await axios : 헌팅 포차 시작.
+      
+      users[roomName].forEach(element => {
+        wsServer.to(element.id).emit("wait-end")
+      });
+      delete waitRoom[roomName];
+    }
+  })
 });

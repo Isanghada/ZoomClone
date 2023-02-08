@@ -31,6 +31,13 @@ const pochaExtensionBtn = document.getElementById("pochaExtension");
 const pochaCheersBtn = document.getElementById("pochaCheers");
 const pochaExitBtn = document.getElementById("pochaExit");
 
+/////////////////////////////////////////////////////
+const wait = document.getElementById("wait");
+wait.hidden = true;
+const waitRoomName = document.getElementById("waitRoomName");
+/////////////////////////////////////////////////////
+
+
 const call = document.getElementById("call");
 call.hidden = true;
 
@@ -185,25 +192,47 @@ const welcomeForm = welcome.querySelector("form");
 
 async function initCall() {
   welcome.hidden = true;
+  wait.hidden = true;
   call.hidden = false;
 
   await getMedia();
 }
 
-async function handleWelcomeSubmit(event) {
+async function handleWelcomeWait(event) {
   event.preventDefault();
+
+  welcome.hidden = true;
+  wait.hidden = false;
+  call.hidden = true;
+
   const input = welcomeForm.querySelector("input");
-  await initCall();
-  socket.emit("join_room", {
+  waitRoomName.innerText = `방 번호 : ${input.value} 대기중`
+
+  socket.emit("wait", {
     roomName: input.value,
-    username: "testname",
-    nickname: "testnickname",
-  });
+    username: `testname${socket.id}`,
+    nickname: `testnick-${socket.id}`
+  })
+
   roomName = input.value;
   input.value = "";
 }
 
-welcomeForm.addEventListener("submit", handleWelcomeSubmit);
+async function handleWelcomeSubmit(event) {
+  //event.preventDefault();
+  // const input = welcomeForm.querySelector("input");
+  await initCall();
+  socket.emit("join_room", {
+    roomName: roomName,
+    username: `testname${socket.id}`,
+    nickname: `testnick-${socket.id}`
+  });
+  // roomName = input.value;
+  input.value = "";
+}
+
+// welcomeForm.addEventListener("submit", handleWelcomeSubmit);
+welcomeForm.addEventListener("submit", handleWelcomeWait);
 
 // Socket Code
 socket.on("users_of_room", async (users) => {
@@ -363,6 +392,9 @@ socket.on("pocha_cheers", async () => {
   await pocha_config_update(3);
 });
 
+
+// 헌팅 포차 시작 기능 : 대기 방에서 방으로 이동!!
+socket.on("wait-end", handleWelcomeSubmit);
 //////////////////////////////////////////////////////
 
 // RTC Code
