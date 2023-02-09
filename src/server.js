@@ -21,8 +21,10 @@ const handleListen = () => console.log("Listening on http://localhost:3000");
 httpServer.listen(3000, handleListen);
 
 let waitRoom = {};
-let users = {};
+let waitToRoom = {};
+let waitUsers = {};
 
+let users = {};
 let socketToRoom = {};
 
 const maximum = 6;
@@ -64,20 +66,22 @@ wsServer.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    const roomID = socketToRoom[socket.id];
-    let room = users[roomID];
-    delete socketToRoom[socket.id];
-    socket.leave(roomID);
-    if (room) {
-      room = room.filter((user) => user.id !== socket.id);
-      users[roomID] = room;
-      if (room.length === 0) {
-        delete users[roomID];
-        return;
+    if(waitToRoom[socket.id] == null || waitToRoom[socket.id] == undefined ){
+      const roomID = socketToRoom[socket.id];
+      let room = users[roomID];
+      delete socketToRoom[socket.id];
+      socket.leave(roomID);
+      if (room) {
+        room = room.filter((user) => user.id !== socket.id);
+        users[roomID] = room;
+        if (room.length === 0) {
+          delete users[roomID];
+          return;
+        }
       }
-    }
-    if(waitRoom[roomID] == null || waitRoom[roomID] == undefined ){
       socket.to(roomID).emit("user_exit", { id: socket.id });
+    } else {
+      delete waitToRoom[socket.id];
     }
   });
 
@@ -106,35 +110,37 @@ wsServer.on("connection", (socket) => {
   // 포차 대기
   socket.on("wait", info => {
     if (waitRoom[info.roomName] == null || waitRoom[info.roomName] == undefined) {
-      waitRoom[info.roomName] = true;
+      waitRoom[info.roomName] = info.limit;
     }
 
     const roomName = info.roomName;
 
-    if (users[roomName]) {
-      const length = users[roomName].length;
+    if (waitUsers[roomName]) {
+      const length = waitUsers[roomName].length;
       if (length == maximum) {
         socket.emit("room_full");
         return;
       }
-      users[roomName].push({
+      waitUsers[roomName].push({
         id: socket.id,
         username: info.username,
         nickname: info.nickname,
       });
     } else {
-      users[roomName] = [
+      waitUsers[roomName] = [
         { id: socket.id, username: info.username, nickname: info.nickname },
       ];
     }
-    socketToRoom[socket.id] = roomName;
+    waitToRoom[socket.id] = roomName;
 
-    if (users[roomName].length == 3) {
+    // 대기 인원이 가득 찼는지 확인.
+    if (waitUsers[roomName].length == waitRoom[roomName]) {
+      const now = new Date();
       // await axios : 헌팅 포차 시작.
-      
-      users[roomName].forEach(element => {
-        wsServer.to(element.id).emit("wait-end")
+      waitUsers[roomName].forEach(element => {
+        wsServer.to(element.id).emit("wait-end", now);
       });
+      delete waitUsers[roomName];
       delete waitRoom[roomName];
     }
   })

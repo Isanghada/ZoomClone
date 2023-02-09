@@ -211,14 +211,15 @@ async function handleWelcomeWait(event) {
   socket.emit("wait", {
     roomName: input.value,
     username: `testname${socket.id}`,
-    nickname: `testnick-${socket.id}`
+    nickname: `testnick-${socket.id}`,
+    limit: 4
   })
 
   roomName = input.value;
   input.value = "";
 }
 
-async function handleWelcomeSubmit(event) {
+async function handleWelcomeSubmit() {
   //event.preventDefault();
   // const input = welcomeForm.querySelector("input");
   await initCall();
@@ -394,7 +395,18 @@ socket.on("pocha_cheers", async () => {
 
 
 // 헌팅 포차 시작 기능 : 대기 방에서 방으로 이동!!
-socket.on("wait-end", handleWelcomeSubmit);
+socket.on("wait-end", now => {
+  alert("대기 완료!!!");
+
+  let goal = new Date(now);
+  console.log(goal);
+  goal.setSeconds(goal.getSeconds() + 20)
+  const waitTime = goal.getTime();
+  const startTime = new Date().getTime();
+  console.log(waitTime);
+  console.log(startTime);
+  setTimeout(handleWelcomeSubmit, waitTime - startTime);
+});
 //////////////////////////////////////////////////////
 
 // RTC Code
